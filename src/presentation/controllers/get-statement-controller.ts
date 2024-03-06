@@ -20,7 +20,7 @@ export class GetStatementController implements Controller {
           client_id: yup.number().integer().positive().required(),
         }),
       })
-      .validate(httpRequest, { abortEarly: false })
+      .validate(httpRequest)
   }
 
   async execute({ params }: ValidHttpRequest): Promise<HttpResponse> {

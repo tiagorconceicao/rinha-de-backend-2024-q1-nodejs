@@ -33,7 +33,7 @@ export class CreateTransactionController implements Controller {
           descricao: yup.string().max(10).required(),
         }),
       })
-      .validate(httpRequest, { abortEarly: false })
+      .validate(httpRequest)
   }
 
   async execute({ params, body }: ValidHttpRequest): Promise<HttpResponse> {
