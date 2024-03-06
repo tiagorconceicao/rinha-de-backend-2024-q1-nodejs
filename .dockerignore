@@ -1,0 +1,12 @@
+docker-compose-remote.yml
+sql
+scripts
+nginx
+run.sh
+README.txt
+nodemon.json
+tsconfig*.json
+
+node_modules
+src
+.env
