@@ -25,7 +25,7 @@ export class GetStatementSpgRepository implements GetStatementRepository {
   ): Promise<GetStatementRepository.Result> {
     const date = new Date()
 
-    const client = await this.clientModel.findByPk(client_id, { transaction })
+    const client = await this.clientModel.findByPk(client_id, { transaction, lock: true })
     if (!client) throw new NotFoundError('Client not found')
 
     const transactions = await this.transactionModel.findAll({
@@ -33,6 +33,7 @@ export class GetStatementSpgRepository implements GetStatementRepository {
       order: [['created_at', 'DESC']],
       limit: 10,
       transaction,
+      lock: true,
     })
 
     await transaction.commit()

@@ -25,7 +25,7 @@ export class CreateTransactionSpgRepository implements CreateTransactionReposito
   ): Promise<CreateTransactionRepository.Result> {
     const op = type === 'c' ? 1 : -1
 
-    const client = await this.clientModel.findByPk(client_id, { transaction })
+    const client = await this.clientModel.findByPk(client_id, { transaction, lock: true })
     if (!client) throw new NotFoundError('Client not found')
 
     const nextBalance = client.balance + op * amount
