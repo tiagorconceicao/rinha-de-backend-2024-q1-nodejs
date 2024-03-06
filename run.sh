@@ -46,6 +46,11 @@ function RunDockerImagePush()
   docker push $DOCKER_IMAGE
 }
 
+function UpLocalDockerContainer()
+{
+  docker compose -f ./docker-compose-local.yml up
+}
+
 function UpRemoteDockerContainer()
 {
   docker compose -f ./docker-compose-remote.yml up
@@ -59,10 +64,11 @@ function UpRemoteDockerContainer()
 DOCKER_CLEAR=false
 DOCKER_BUILD=false
 DOCKER_PUSH=false
+DOCKER_UP_LOCAL=false
 DOCKER_UP_REMOTE=false
 
 # Get the options
-OPTSTRING=":hcbpR"
+OPTSTRING=":hcbpLR"
 while getopts ${OPTSTRING} opt; do
   case $opt
   in
@@ -78,6 +84,9 @@ while getopts ${OPTSTRING} opt; do
      p)
         DOCKER_PUSH=true
         ;;      
+     L)
+        DOCKER_UP_LOCAL=true
+        ;;
      R)
         DOCKER_UP_REMOTE=true
         ;;      
@@ -105,6 +114,11 @@ main() {
   if [ $DOCKER_PUSH == true ]
   then
     RunDockerImagePush
+  fi
+
+  if [ $DOCKER_UP_LOCAL == true ]
+  then
+    UpLocalDockerContainer
   fi
 
   if [ $DOCKER_UP_REMOTE == true ]
