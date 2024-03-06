@@ -1,5 +1,3 @@
-import { type TransactionModel } from '@/app/protocols/models'
-
 export namespace GetStatementRepository {
   export const name = 'GetStatementRepository'
   export type Params = number
@@ -7,7 +5,12 @@ export namespace GetStatementRepository {
     balance: number
     limit: number
     date: Date
-    transactions: TransactionModel[]
+    transactions: Array<{
+      type: string
+      amount: number
+      description: string
+      created_at: Date | string
+    }>
   }
 }
 
