@@ -7,7 +7,7 @@ const numericHandler = (defaultNumber: number, value?: any): number => {
   return parsed
 }
 
-export const PORT = 3000
+export const PORT = numericHandler(3000, process.env.PORT)
 
 export const SERVER_NAME = process.env.SERVER_NAME ?? 'SERVER'
 
