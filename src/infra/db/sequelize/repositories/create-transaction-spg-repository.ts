@@ -1,5 +1,4 @@
-import { type CreateTransactionRepository } from '@/app/protocols/repositories'
-
+import { type CreateTransactionRepository, type SetStatementCache } from '@/app/protocols'
 import { sequelizeHelper, type ModelStatic } from '../helper'
 import clientModelInit, { type ClientSpgModel } from '../models/client-spg-model'
 import transactionModelInit, { type TransactionSpgModel } from '../models/transaction-spg-model'
@@ -11,7 +10,7 @@ export class CreateTransactionSpgRepository implements CreateTransactionReposito
   private readonly clientModel: ModelStatic<ClientSpgModel>
   private readonly transactionModel: ModelStatic<TransactionSpgModel>
 
-  constructor() {
+  constructor(private readonly setStatementCache: SetStatementCache) {
     const [sequelize, dataTypes] = sequelizeHelper.getClient()
     this.sequelize = sequelize
 
@@ -41,18 +40,33 @@ export class CreateTransactionSpgRepository implements CreateTransactionReposito
         where: { id: client_id },
       },
     )
-
+    const created_at = new Date()
     await this.transactionModel.create(
       {
         client_id,
         type,
         amount,
         description,
+        created_at,
       },
       {
         transaction,
       },
     )
+
+    transaction.afterCommit(async () => {
+      await this.setStatementCache.run({
+        client_id,
+        balance: nextBalance,
+        limit: client.limit,
+        transaction: {
+          type,
+          amount,
+          description,
+          created_at,
+        },
+      })
+    })
 
     await transaction.commit()
     return {
