@@ -31,28 +31,30 @@ export class CreateTransactionSpgRepository implements CreateTransactionReposito
     if (nextBalance < client.limit * -1)
       throw new UnprocessableEntityError('Client does not have enough limit')
 
-    await this.clientModel.update(
-      {
-        balance: nextBalance,
-      },
-      {
-        transaction,
-        where: { id: client_id },
-      },
-    )
     const created_at = new Date()
-    await this.transactionModel.create(
-      {
-        client_id,
-        type,
-        amount,
-        description,
-        created_at,
-      },
-      {
-        transaction,
-      },
-    )
+    await Promise.all([
+      this.clientModel.update(
+        {
+          balance: nextBalance,
+        },
+        {
+          transaction,
+          where: { id: client_id },
+        },
+      ),
+      this.transactionModel.create(
+        {
+          client_id,
+          type,
+          amount,
+          description,
+          created_at,
+        },
+        {
+          transaction,
+        },
+      ),
+    ])
 
     transaction.afterCommit(async () => {
       await this.setStatementCache.run({
