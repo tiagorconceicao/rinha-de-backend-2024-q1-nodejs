@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   api_1: &api
-    image: tiracotech/rinha-de-backend-2024-q1-nodejs:1.1.0
+    image: tiracotech/rinha-de-backend-2024-q1-nodejs:1.2.0
     container_name: api_1
     environment:
       - PG_HOST=db
