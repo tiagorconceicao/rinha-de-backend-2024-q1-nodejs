@@ -44,7 +44,6 @@ services:
           cpus: "0.12"
           memory: "10MB"
 
-
   db:
     image: postgres:16.2
     environment:
@@ -68,21 +67,22 @@ services:
         limits:
           cpus: "0.40"
           memory: "330MB"
-  
   redis:
-    image: redis:alpine
+    image: redis:7.2
     command: redis-server --requirepass 123 --appendonly no
     ports:
       - "6379:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
           cpus: "0.08"
           memory: "10MB"
-
+  
 networks:
   default:
     driver: bridge
-    name: rinha-nginx-2024q1
