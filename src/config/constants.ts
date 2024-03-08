@@ -17,3 +17,6 @@ export const PG_USERNAME = process.env.PG_USERNAME
 export const PG_PASSWORD = process.env.PG_PASSWORD
 export const PG_DATABASE = process.env.PG_DATABASE
 export const PG_SCHEMA = process.env.PG_SCHEMA ?? undefined
+
+export const REDIS_HOST = process.env.REDIS_HOST
+export const REDIS_PASSWORD = process.env.REDIS_PASSWORD

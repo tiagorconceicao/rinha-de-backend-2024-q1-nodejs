@@ -10,15 +10,19 @@ services:
       - PG_USERNAME=admin
       - PG_PASSWORD=123
       - PG_DATABASE=rinha
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=123
     ports:
       - "3000"
     depends_on:
+      redis:
+        condition: service_healthy
       db:
         condition: service_healthy
     deploy:
       resources:
         limits:
-          cpus: "0.49"
+          cpus: "0.45"
           memory: "100MB"
     
   api_2:
@@ -63,7 +67,20 @@ services:
       resources:
         limits:
           cpus: "0.40"
-          memory: "340MB"
+          memory: "330MB"
+  
+  redis:
+    image: redis:alpine
+    command: redis-server --requirepass 123 --appendonly no
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.08"
+          memory: "10MB"
 
 networks:
   default:

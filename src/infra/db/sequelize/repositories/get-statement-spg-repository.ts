@@ -1,5 +1,8 @@
-import { type GetStatementRepository } from '@/app/protocols/repositories'
-
+import {
+  type GetStatementRepository,
+  type GetStatementCache,
+  type SetStatementCache,
+} from '@/app/protocols'
 import { sequelizeHelper, type ModelStatic } from '../helper'
 import clientModelInit, { type ClientSpgModel } from '../models/client-spg-model'
 import transactionModelInit, { type TransactionSpgModel } from '../models/transaction-spg-model'
@@ -11,7 +14,10 @@ export class GetStatementSpgRepository implements GetStatementRepository {
   private readonly clientModel: ModelStatic<ClientSpgModel>
   private readonly transactionModel: ModelStatic<TransactionSpgModel>
 
-  constructor() {
+  constructor(
+    private readonly getStatementCache: GetStatementCache,
+    private readonly setStatementCache: SetStatementCache,
+  ) {
     const [sequelize, dataTypes] = sequelizeHelper.getClient()
     this.sequelize = sequelize
 
@@ -36,6 +42,15 @@ export class GetStatementSpgRepository implements GetStatementRepository {
       lock: true,
     })
 
+    transaction.afterCommit(async () => {
+      await this.setStatementCache.run({
+        client_id,
+        balance: client.balance,
+        limit: client.limit,
+        transactions,
+        options: { force_write: true },
+      })
+    })
     await transaction.commit()
     return {
       limit: client.limit,
@@ -47,6 +62,16 @@ export class GetStatementSpgRepository implements GetStatementRepository {
 
   async run(params: GetStatementRepository.Params): Promise<GetStatementRepository.Result> {
     const date = new Date()
+
+    const cached = await this.getStatementCache.run(params)
+    if (cached)
+      return {
+        limit: cached.limit,
+        balance: cached.balance,
+        date,
+        transactions: cached.transactions,
+      }
+
     const transaction = await this.sequelize.transaction()
 
     try {
