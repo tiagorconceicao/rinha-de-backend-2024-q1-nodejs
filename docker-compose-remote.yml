@@ -46,7 +46,7 @@ services:
 
 
   db:
-    image: postgres:latest
+    image: postgres:16.2
     environment:
       - POSTGRES_PASSWORD=123
       - POSTGRES_USER=admin

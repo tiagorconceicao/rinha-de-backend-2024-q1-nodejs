@@ -6,10 +6,11 @@ const main = async (): Promise<void> => {
   await sequelizeHelper.auth()
   await redisHelper.auth()
 
-  const { setApp } = await import('@/main/app')
+  const { setApp } = await import('@/main/app/fastify-app')
   const app = setApp()
 
-  app.listen(PORT, function () {
+  app.listen({ port: PORT, host: '0.0.0.0' }, (err, address) => {
+    if (err) throw err
     console.log(`✅️ Server ready! Listening at http://[::]:${PORT} | ${new Date().toISOString()}`)
   })
 }
